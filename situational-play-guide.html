@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚾ 野球 状況別プレーガイド</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=M+PLUS+Rounded+1c:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-dark: #0f1923;
+  --bg-card: #1a2634;
+  --bg-card-hover: #1f2f40;
+  --accent-blue: #2196f3;
+  --accent-cyan: #00bcd4;
+  --accent-green: #4caf50;
+  --accent-orange: #ff9800;
+  --accent-red: #f44336;
+  --accent-yellow: #ffd600;
+  --accent-purple: #ab47bc;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-muted: #5f6368;
+  --border: #2d3d4f;
+  --defense-color: #2196f3;
+  --offense-color: #ff9800;
+  --field-green: #2e7d32;
+  --dirt-brown: #8d6e63;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(33,150,243,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(255,152,0,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== HEADER ===== */
+.header {
+  text-align: center;
+  padding: 50px 20px 30px;
+}
+.header-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 16px;
+  border-radius: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.header h1 {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: clamp(26px, 5vw, 42px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, #90caf9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+.header p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== CONTROLS ===== */
+.controls {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 24px 0;
+  position: sticky;
+  top: 8px;
+  z-index: 50;
+  backdrop-filter: blur(12px);
+}
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.control-group {
+  flex: 1;
+  min-width: 200px;
+}
+.control-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8px;
+}
+.btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn:hover {
+  border-color: var(--accent-blue);
+  background: rgba(33,150,243,0.1);
+}
+.btn.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+  box-shadow: 0 2px 12px rgba(33,150,243,0.3);
+}
+.btn-runner {
+  font-size: 12px;
+  padding: 6px 12px;
+}
+.btn-runner.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  box-shadow: 0 2px 12px rgba(255,152,0,0.3);
+}
+
+/* ===== SITUATION DISPLAY ===== */
+.situation-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+.situation-diamond {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+.situation-text {
+  text-align: center;
+}
+.situation-text h2 {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent-yellow);
+}
+.situation-text p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* ===== CONTENT PANELS ===== */
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 8px;
+}
+@media (max-width: 768px) {
+  .panels { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 18px 22px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-header.defense {
+  background: linear-gradient(135deg, rgba(33,150,243,0.12), rgba(0,188,212,0.08));
+}
+.panel-header.offense {
+  background: linear-gradient(135deg, rgba(255,152,0,0.12), rgba(255,87,34,0.08));
+}
+.panel-header .icon {
+  font-size: 24px;
+}
+.panel-header h3 {
+  font-size: 16px;
+  font-weight: 900;
+}
+.panel-header.defense h3 { color: var(--accent-blue); }
+.panel-header.offense h3 { color: var(--accent-orange); }
+
+.panel-body {
+  padding: 20px 22px 24px;
+}
+
+/* Position blocks */
+.pos-block {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border-left: 4px solid var(--accent-blue);
+}
+.pos-block:last-child { margin-bottom: 0; }
+.pos-block h4 {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--accent-cyan);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pos-block p, .pos-block li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+.pos-block ul {
+  padding-left: 16px;
+  margin-top: 4px;
+}
+.pos-block li { margin-bottom: 2px; }
+
+/* Offense blocks */
+.off-block {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border-left: 4px solid var(--accent-orange);
+}
+.off-block:last-child { margin-bottom: 0; }
+.off-block h4 {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--accent-yellow);
+  margin-bottom: 6px;
+}
+.off-block p, .off-block li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+.off-block ul {
+  padding-left: 16px;
+  margin-top: 4px;
+}
+.off-block li { margin-bottom: 2px; }
+
+/* Key point highlight */
+.key-point {
+  background: linear-gradient(135deg, rgba(255,214,0,0.1), rgba(255,152,0,0.05));
+  border: 1px solid rgba(255,214,0,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 16px;
+}
+.key-point h5 {
+  font-size: 12px;
+  color: var(--accent-yellow);
+  font-weight: 900;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.key-point p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Tags */
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.tag-force { background: rgba(244,67,54,0.2); color: #ef9a9a; }
+.tag-dp { background: rgba(156,39,176,0.2); color: #ce93d8; }
+.tag-steal { background: rgba(0,188,212,0.2); color: #80deea; }
+.tag-bunt { background: rgba(76,175,80,0.2); color: #a5d6a7; }
+.tag-cutoff { background: rgba(255,152,0,0.2); color: #ffcc80; }
+.tag-priority { background: rgba(255,214,0,0.25); color: #fff176; }
+
+/* Scroll-to-top */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  color: white;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(33,150,243,0.4);
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.scroll-top.show { opacity: 1; }
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 16px 0 8px;
+}
+
+/* No-selection message */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 15px; }
+
+@media (max-width: 600px) {
+  .controls { padding: 16px; position: sticky; top: 0; }
+  .btn { padding: 6px 10px; font-size: 12px; }
+  .panel-body { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <span class="header-badge">Intermediate Guide</span>
+    <h1>状況別プレーガイド</h1>
+    <p>アウトカウント × ランナー状況ごとに、守備・攻撃で何を考えるべきかを整理したガイドです</p>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span class="tag tag-force">フォースプレー</span>
+    <span class="tag tag-dp">ゲッツー警戒</span>
+    <span class="tag tag-steal">盗塁警戒</span>
+    <span class="tag tag-bunt">バント警戒</span>
+    <span class="tag tag-cutoff">中継・カバー</span>
+    <span class="tag tag-priority">最優先</span>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="control-row">
+      <div class="control-group">
+        <div class="control-label">アウトカウント</div>
+        <div class="btn-group">
+          <button class="btn" data-out="0" onclick="setOut(0)">ノーアウト</button>
+          <button class="btn" data-out="1" onclick="setOut(1)">ワンアウト</button>
+          <button class="btn" data-out="2" onclick="setOut(2)">ツーアウト</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="control-label">ランナー状況</div>
+        <div class="btn-group">
+          <button class="btn btn-runner" data-runner="0" onclick="setRunner('0')">なし</button>
+          <button class="btn btn-runner" data-runner="1" onclick="setRunner('1')">一塁</button>
+          <button class="btn btn-runner" data-runner="2" onclick="setRunner('2')">二塁</button>
+          <button class="btn btn-runner" data-runner="3" onclick="setRunner('3')">三塁</button>
+          <button class="btn btn-runner" data-runner="12" onclick="setRunner('12')">一二塁</button>
+          <button class="btn btn-runner" data-runner="13" onclick="setRunner('13')">一三塁</button>
+          <button class="btn btn-runner" data-runner="23" onclick="setRunner('23')">二三塁</button>
+          <button class="btn btn-runner" data-runner="123" onclick="setRunner('123')">満塁</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Situation display -->
+  <div class="situation-banner" id="situationBanner" style="display:none;">
+    <svg class="situation-diamond" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,90 90,50 50,10 10,50" fill="none" stroke="#2d3d4f" stroke-width="2"/>
+      <!-- Home -->
+      <polygon points="50,90 45,84 50,78 55,84" fill="#5f6368" stroke="#9aa0a6" stroke-width="1"/>
+      <!-- 1st -->
+      <rect id="base1" x="85" y="45" width="10" height="10" rx="1" fill="#2d3d4f" stroke="#5f6368" stroke-width="1" transform="rotate(45 90 50)"/>
+      <!-- 2nd -->
+      <rect id="base2" x="45" y="5" width="10" height="10" rx="1" fill="#2d3d4f" stroke="#5f6368" stroke-width="1" transform="rotate(45 50 10)"/>
+      <!-- 3rd -->
+      <rect id="base3" x="5" y="45" width="10" height="10" rx="1" fill="#2d3d4f" stroke="#5f6368" stroke-width="1" transform="rotate(45 10 50)"/>
+    </svg>
+    <div class="situation-text">
+      <h2 id="situationTitle">-</h2>
+      <p id="situationSub">状況を選択してください</p>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState">
+    <div class="icon">👆</div>
+    <p>アウトカウントとランナー状況を<br>選択してください</p>
+  </div>
+
+  <!-- Content panels -->
+  <div class="panels" id="panels" style="display:none;">
+    <div class="panel">
+      <div class="panel-header defense">
+        <span class="icon">🛡️</span>
+        <h3>守備側の意識</h3>
+      </div>
+      <div class="panel-body" id="defenseContent"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-header offense">
+        <span class="icon">⚔️</span>
+        <h3>攻撃側の意識</h3>
+      </div>
+      <div class="panel-body" id="offenseContent"></div>
+    </div>
+  </div>
+</div>
+
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+let currentOut = null;
+let currentRunner = null;
+
+function setOut(n) {
+  currentOut = n;
+  document.querySelectorAll('[data-out]').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-out="${n}"]`).classList.add('active');
+  render();
+}
+
+function setRunner(r) {
+  currentRunner = r;
+  document.querySelectorAll('[data-runner]').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-runner="${r}"]`).classList.add('active');
+  render();
+}
+
+function render() {
+  if (currentOut === null || currentRunner === null) return;
+
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('situationBanner').style.display = 'flex';
+  document.getElementById('panels').style.display = 'grid';
+
+  // Update diamond
+  const runnerSet = new Set(currentRunner === '0' ? [] : currentRunner.split('').map(Number));
+  ['1','2','3'].forEach(b => {
+    const el = document.getElementById('base' + b);
+    if (runnerSet.has(parseInt(b))) {
+      el.setAttribute('fill', '#ff9800');
+      el.setAttribute('stroke', '#ffd600');
+    } else {
+      el.setAttribute('fill', '#2d3d4f');
+      el.setAttribute('stroke', '#5f6368');
+    }
+  });
+
+  const outLabels = ['ノーアウト', 'ワンアウト', 'ツーアウト'];
+  const runnerLabels = { '0':'ランナーなし', '1':'ランナー一塁', '2':'ランナー二塁', '3':'ランナー三塁', '12':'ランナー一二塁', '13':'ランナー一三塁', '23':'ランナー二三塁', '123':'満塁' };
+  document.getElementById('situationTitle').textContent = `${outLabels[currentOut]}・${runnerLabels[currentRunner]}`;
+
+  const key = `${currentOut}_${currentRunner}`;
+  const data = situations[key];
+
+  if (data) {
+    document.getElementById('defenseContent').innerHTML = data.defense;
+    document.getElementById('offenseContent').innerHTML = data.offense;
+  }
+
+  // Scroll to panels
+  document.getElementById('situationBanner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===========================
+// ALL SITUATION DATA
+// ===========================
+const situations = {
+
+// ============================================================
+// ノーアウト (0) × ランナー一塁 (1)
+// ============================================================
+// ============================================================
+// ノーアウト (0) × ランナーなし (0)
+// ============================================================
+"0_0": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ランナーがいないのでワインドアップで投球OK</li>
+    <li>ストライク先行でカウントを有利に進める</li>
+    <li>先頭打者を出さないことが最優先</li>
+    <li>テンポよく投げてリズムを作る</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>先頭打者を打ち取る配球。フォアボールは出さない</li>
+    <li>守備陣への声掛け。集中させる</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>通常守備位置。定位置で確実にアウトを取る</li>
+    <li>ゴロは一塁へ確実に送球</li>
+    <li>エラーで出塁させない。確実な捕球と送球</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>通常守備位置。打球への一歩目を大切に</li>
+    <li>長打を打たれた場合、中継送球で二塁打に留める</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> 外野間のカバーリング（センターはレフト・ライトのカバー）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ランナーなしはプレッシャーが少ない場面。先頭打者を出さず、テンポよくアウトを重ねることが大切。エラーと四球で自らピンチを招かないこと。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>先頭打者として出塁することが最大の仕事</li>
+    <li>初球からストライクが来やすい。甘い球を逃さない</li>
+    <li>フォアボールでもOK。ボール球を見極める</li>
+    <li>セーフティバントで意表を突くのも選択肢</li>
+    <li>出塁すれば次の打者以降にチャンスが広がる</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>先頭打者の出塁がチャンスの始まり。ヒット・フォアボール・エラーなど手段は問わず出塁を目指す。積極的に初球から狙っていきたい。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナーなし (0)
+// ============================================================
+"1_0": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ランナーなし・ワンアウト。落ち着いて投球</li>
+    <li>フォアボールでランナーを出さないことが大事</li>
+    <li>あと2アウトでチェンジ。テンポよく</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>リズムよくピッチャーを引っ張る</li>
+    <li>この打者を打ち取れば二死走者なしの楽な展開に</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野・外野全体</h4>
+  <ul>
+    <li>通常守備位置で確実にプレー</li>
+    <li>ゴロは一塁へ。フライは確実にキャッチ</li>
+    <li>エラーで出塁させない集中力</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>プレッシャーの少ない場面。フォアボールとエラーでランナーを出さないこと。確実にアウトカウントを増やす。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ワンアウトでも出塁すれば十分チャンスメーク</li>
+    <li>長打を打てれば得点圏にいきなり立てる</li>
+    <li>フォアボールでも次の打者に繋がる</li>
+    <li>相手バッテリーの配球パターンを前の打者から観察しておく</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ワンアウトからでも出塁→盗塁→ヒットで得点は十分可能。粘り強く出塁を目指す。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナーなし (0)
+// ============================================================
+"2_0": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>あと1アウトでチェンジ。集中して打ち取る</li>
+    <li>油断しない。ここからの長打・連打で失点もあり得る</li>
+    <li>フォアボールは絶対に避ける（ツーアウトから四球は流れが悪い）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野・外野全体</h4>
+  <ul>
+    <li>通常守備位置で最後の1アウトを確実に</li>
+    <li>ツーアウトからの失点は精神的ダメージが大きいので集中</li>
+    <li>長打への備えも忘れずに</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>あと1アウト。確実に打ち取ってチェンジ。ツーアウトから出塁を許すと相手に流れが行きやすいので、油断せず集中すること。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ツーアウトでも諦めない。「ツーアウトからが勝負」の気持ち</li>
+    <li>出塁すれば次の打者に繋がり、まだ何が起こるか分からない</li>
+    <li>粘ってフォアボールでもOK。簡単にアウトにならない</li>
+    <li>ツーアウトからの連打・長打で得点した経験はチームの財産になる</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>「ツーアウトから」が合言葉。出塁さえすれば何が起こるか分からない。粘り強くボールを見極めて出塁を目指す。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー二塁 (2)
+// ============================================================
+"0_2": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>得点圏にランナー。集中して打ち取る</li>
+    <li>セットポジションから投球。二塁ランナーの動きに注意</li>
+    <li>二塁牽制（セカンド・ショートとの連携プレー）を織り交ぜる</li>
+    <li>ヒット1本で得点される。低めに集める</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-steal">盗塁警戒</span> 三盗に注意。二塁ランナーのリードを確認</li>
+    <li>サイン盗みに注意（二塁ランナーからサインが見える位置）。サインを複雑にする</li>
+    <li>パスボール注意（三塁に進まれるとさらにピンチ）</li>
+    <li>内野に「一本で帰さない」の声掛け</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li>ランナーがいないので一塁ベースに付く必要なし。守備位置で打球に備える</li>
+    <li>ゴロ処理→一塁でアウト</li>
+    <li>右方向へのヒットで二塁ランナーが生還しないようバックホーム中継に備える</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li>二塁牽制のサインプレーに参加（ピッチャーとの連携）</li>
+    <li>センター方向のヒットでのカットマン（中継）位置</li>
+    <li>ゴロ処理→一塁送球</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> 送りバントで三塁に進められる可能性。前進守備</li>
+    <li>三塁線を抜かれると長打→得点。ラインを締める</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>二塁牽制のサインプレーに参加</li>
+    <li>三盗への備え。三塁ベースカバー</li>
+    <li>レフト方向ヒットのカットマン位置</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> シングルヒットで二塁ランナーが生還する。素早い返球が最重要</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> カットマンへ低く正確な送球</li>
+    <li>前進守備で浅いヒットでのホームインを防ぐか、長打警戒で下がるか判断</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>得点圏にランナー。ヒット1本で得点を許す場面。外野は素早い返球、内野はバントと三盗への備え、バッテリーはサイン盗み対策を。まずは打者を打ち取ることに集中。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒット1本で1点のチャンス。集中して打席に立つ</li>
+    <li><span class="tag tag-bunt">バント</span> 送りバントでランナーを三塁に進める（一死三塁を作る）のも有効</li>
+    <li>右方向への打球でランナーを三塁に進められる（進塁打）</li>
+    <li>最低限、ランナーを進める打撃を心がける</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>リードを大きく取りたいが、牽制に備える</li>
+    <li>ヒットならホームを狙う。三塁コーチの指示をよく見る</li>
+    <li>ゴロの方向を見てスタート判断。三塁側のゴロは動けないことも</li>
+    <li>ワイルドピッチ・パスボールで三塁へ</li>
+    <li>フライは帰塁準備。タッチアップで三塁を狙えるケースも</li>
+    <li>三盗も選択肢（足に自信がある場合）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>得点圏にランナー。ノーアウトなのでバントで三塁に進めるか、ヒットで一気に得点するか選択できる。最低限ランナーを三塁に進めて、次の打者での得点を狙う。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー二塁 (2)
+// ============================================================
+"1_2": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ヒット1本で得点される。集中して打ち取る</li>
+    <li>二塁牽制を織り交ぜる</li>
+    <li>内野ゴロならランナーは動けないことが多い。ゴロを打たせたい</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>サイン盗み対策。サインを変える</li>
+    <li>三盗警戒</li>
+    <li>パスボール注意</li>
+    <li>敬遠策（一塁を埋めてゲッツー狙い）も選択肢</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>ゴロは一塁でアウト。ランナーの動きを見て三塁に投げない（無理な送球はエラーの元）</li>
+    <li>二塁ランナーが三塁に行っても、ホームに帰さなければOK</li>
+    <li>敬遠で一塁を埋めた場合はダブルプレー狙い</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットでのホームインを防ぐ素早い返球</li>
+    <li>前進守備で浅いヒットでの生還を防ぐか判断</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> カットマンへの正確な送球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ヒット1本で得点される場面。打者を打ち取ることが最優先。敬遠で一塁を埋めてゲッツー狙いも有効な作戦。内野は無理な三塁送球よりも確実に一塁でアウトを。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒット1本で得点できる。集中して甘い球を打つ</li>
+    <li>右方向への打球で最低限ランナーを三塁に進める（進塁打）</li>
+    <li>外野フライでもランナーがタッチアップで三塁に進める</li>
+    <li>敬遠されることもある。次の打者も準備</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>ヒットならホーム狙い。三塁コーチの指示に従う</li>
+    <li>ゴロの方向・強さを見て走塁判断</li>
+    <li>外野フライでタッチアップして三塁へ</li>
+    <li>ワイルドピッチ・パスボールで三塁へ</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ヒット1本で得点。進塁打やタッチアップで三塁に進め、次の打者での得点チャンスを広げるのも重要。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー二塁 (2)
+// ============================================================
+"2_2": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>1アウトでチェンジ。バッターとの勝負に集中</li>
+    <li>ヒットで1点入る可能性大。丁寧に低めへ</li>
+    <li>敬遠して一塁を埋める策もあり（次の打者との相性次第）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>バッターを打ち取ることに集中</li>
+    <li>サイン盗み対策</li>
+    <li>敬遠の判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>確実に1アウト。一塁送球が最も確実</li>
+    <li>長打警戒も忘れずに</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットで得点される可能性大。素早い返球</li>
+    <li>長打警戒で深めの守備位置（頭を越されると確実に得点）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>1アウトでチェンジ。バッターを確実に打ち取ることだけに集中。敬遠策も含めてバッテリーで最善の判断を。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒットで1点のチャンス。ツーアウトでもゲッツーの心配なし</li>
+    <li>思い切り振って長打を狙うのもOK</li>
+    <li>敬遠されたらチャンスが広がる。次の打者に繋ぐ</li>
+    <li>ファールで粘ってカウントを稼ぐのも大事</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>ツーアウトなので打球が飛んだら迷わずスタート</li>
+    <li>シングルヒットで一気にホームを狙う</li>
+    <li>三塁コーチの指示をよく見て判断</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ツーアウトだがヒット1本で1点。ランナーは打球と同時にスタート。打者は積極的に甘い球を狙いに行く。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー三塁 (3)
+// ============================================================
+"0_3": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ワイルドピッチ＝失点。コントロール最優先</li>
+    <li>ワンバウンドになるボールは避ける</li>
+    <li>三振を取りに行くよりも内野ゴロで打ち取りたい</li>
+    <li>スクイズ警戒。セットポジションから素早く</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 後逸厳禁。ワンバウンドは体で止める</li>
+    <li><span class="tag tag-bunt">バント警戒</span> スクイズに備え、ホームベース前の打球処理準備</li>
+    <li>三塁ランナーの飛び出しを狙って三塁送球もあり</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト・🟣 セカンド</h4>
+  <ul>
+    <li>内野ゴロでのホーム送球か一塁送球かの判断</li>
+    <li>弱いゴロ→ホーム送球、強いゴロ→一塁でアウト（1点覚悟）</li>
+    <li>前進守備の位置取り</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> スクイズ処理の最前線。前進守備</li>
+    <li>バント処理→ホームへの送球で三塁ランナーを刺す</li>
+    <li>三塁ベースを離れているのでショートがカバー</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>サード前進時の三塁ベースカバー</li>
+    <li>ゴロ処理→一塁送球かホーム送球かの判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 外野フライでタッチアップ→1点。前進守備で犠牲フライを防ぐ</li>
+    <li>浅いフライでもタッチアップされる。捕球後は即ホーム送球</li>
+    <li>前進することで頭を越される長打のリスクもある。チームの方針で位置を決める</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ノーアウト三塁は非常に厳しい場面。犠牲フライ・スクイズ・内野ゴロでも1点入る可能性。「1点は覚悟して確実にアウトを取る」か「全力で得点を防ぐ」か方針を統一。ワイルドピッチだけは絶対ダメ。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>外野フライだけでも犠牲フライで1点。最低限飛ばす</li>
+    <li><span class="tag tag-bunt">スクイズ</span> スクイズバントで確実に1点を取る策もある</li>
+    <li>ノーアウトなので三振・ポップフライは避けたい</li>
+    <li>強打で長打なら大量点の可能性</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>外野フライでタッチアップ。捕球と同時にスタート</li>
+    <li>スクイズ時は投球と同時にスタート</li>
+    <li>内野ゴロでもスタート可能（打球の強さと方向で判断）</li>
+    <li>ワイルドピッチ・パスボールで即ホームイン</li>
+    <li>リードは投球ごとにしっかり取る</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ノーアウトで三塁。犠牲フライ・スクイズなど確実に1点取る方法が多い。最低限1点は取りたい場面。打者は三振とポップフライだけは避ける。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー三塁 (3)
+// ============================================================
+"1_3": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ワイルドピッチ厳禁。丁寧な投球</li>
+    <li>三振が取れれば理想。あと2アウトでチェンジ</li>
+    <li>犠牲フライで1点のリスク。外野フライを打たせないよう低めに</li>
+    <li>スクイズ警戒は低め（ワンアウトからのスクイズは少ないが0ではない）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>後逸厳禁。ワンバウンドは体で止める</li>
+    <li>内野の守備位置を指示（前進守備 or 通常守備）</li>
+    <li>打者との勝負に集中した配球</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>前進守備でゴロ→ホーム送球（得点阻止）を狙うか</li>
+    <li>通常守備で確実にバッターをアウトにするか</li>
+    <li><span class="tag tag-force">フォースプレー</span>なし。ホームはタッチプレー必須</li>
+    <li>弱いゴロならホーム。強いゴロなら一塁。瞬時の判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 犠牲フライ警戒。前進守備で得点を防ぐ</li>
+    <li>捕球後は素早いバックホーム</li>
+    <li>前進守備で頭を越されるリスクとのバランス</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>犠牲フライで1点入る場面。外野は前進守備で対応。内野は前進守備でホーム送球を狙うか、通常守備で確実にアウトを取るか判断。チームの得点状況に応じて方針を決める。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>外野フライで犠牲フライ1点。高く遠くに飛ばす意識</li>
+    <li>内野ゴロでも三塁ランナーのスタート次第で得点可能</li>
+    <li>最低限、三振とポップフライは避ける</li>
+    <li>ヒットなら確実に1点以上</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>外野フライはタッチアップで確実にホームイン</li>
+    <li>内野ゴロのスタート判断。前進守備なら打球の強さを見極める</li>
+    <li>ワイルドピッチ・パスボールで即スタート</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>犠牲フライで確実に1点取りたい。打者は最低限外野フライを上げること。ランナーはタッチアップの準備を忘れずに。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー三塁 (3)
+// ============================================================
+"2_3": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>あと1アウトでチェンジ。バッターとの勝負に全力集中</li>
+    <li>ワイルドピッチ＝失点。丁寧に投げる</li>
+    <li>三振が取れれば最高。決め球で勝負</li>
+    <li>ツーアウトなので犠牲フライの心配はほぼない</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>後逸厳禁。この1球で試合が決まることもある</li>
+    <li>打者を打ち取る配球に集中</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>通常守備位置でOK（犠牲フライの心配がないので前進不要）</li>
+    <li>確実に1アウト取ることだけに集中</li>
+    <li>内野安打を防ぐ。打球への一歩目を大切に</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ツーアウトなので前進守備は不要。通常 or やや深めの守備位置</li>
+    <li>ヒットで得点されるがフライならアウト→チェンジ</li>
+    <li>長打警戒。頭を越されないように</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ツーアウトなので犠牲フライの心配なし。バッターをアウトにすればチェンジ。ヒットだけが失点に繋がるので、打者との勝負に集中。ワイルドピッチ・パスボールの失点だけは防ぐ。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒットで1点。ツーアウトだがチャンスは十分ある</li>
+    <li>ツーアウトなのでゲッツーの心配なし。思い切り打てる</li>
+    <li>フォアボールでも繋がる。ボール球は振らない</li>
+    <li>相手バッテリーはストライクで勝負してくる。甘い球を逃さない</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>ツーアウトなので打球が飛んだら迷わずスタート</li>
+    <li>ワイルドピッチ・パスボールで即ホームイン</li>
+    <li>ツーアウトなのでリードは大きめに取れる</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ツーアウトでもヒット1本で1点。ランナーは打球と同時にスタート。打者は粘り強く好球を待ち、甘い球を逃さず振り抜く。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー一塁 (1)
+// ============================================================
+"0_1": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>クイックモーション必須。一塁ランナーの盗塁を警戒</li>
+    <li>牽制球を織り交ぜてランナーのリードを抑える</li>
+    <li>バント処理の準備（打球方向を見て一塁or二塁へ送球判断）</li>
+    <li>ゴロが来たら二塁→一塁のダブルプレーを狙う</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-steal">盗塁警戒</span> 盗塁に備え素早い送球準備。二塁送球の構え</li>
+    <li><span class="tag tag-bunt">バント警戒</span> バントの構えが見えたら「バント！」と声出し</li>
+    <li>打球処理後、一塁カバーまたは三塁カバーの判断</li>
+    <li>守備隊形の指示役。ゲッツーシフトの声掛け</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li>ランナーをベースに釘付け（牽制球を受ける）</li>
+    <li><span class="tag tag-bunt">バント警戒</span> バント処理で前進。捕ったら二塁or一塁への送球判断</li>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ゴロの場合、送球を受けてダブルプレー完成</li>
+    <li>外野への打球時は二塁送球のカットマン（中継）位置に入る</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ダブルプレーの要。二塁ベースカバーに入る</li>
+    <li>ショートとの連携：ゴロの方向で二塁ベースカバーをどちらが入るか決めておく</li>
+    <li>盗塁時のベースカバー（セカンド寄りの打者ならショート、逆ならセカンドが入る）</li>
+    <li>バントシフト時は一塁カバーに回ることもある</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> バント処理で前進ダッシュ。捕球後は二塁への送球が理想</li>
+    <li>ゴロ処理→二塁送球でダブルプレー開始</li>
+    <li>三塁線の打球に注意（長打コース）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> 二塁ベースカバーに入りダブルプレーの起点</li>
+    <li>ゴロ→二塁→一塁のダブルプレーを常に意識</li>
+    <li>盗塁時の二塁ベースカバー分担をセカンドと確認</li>
+    <li>中継プレーではポジショニングの指示</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手（レフト・センター・ライト）</h4>
+  <ul>
+    <li>打球に備えて前進守備は不要（通常ポジション）</li>
+    <li>ヒット性の打球→ 二塁へ素早い返球（ランナーの進塁を防ぐ）</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> カットマンに正確な返球。暴投防止</li>
+    <li>センターは二塁ベース後方のカバーを意識</li>
+    <li>ライトは一塁後方のカバー</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ノーアウト一塁はダブルプレーの絶好のチャンス。内野ゴロが来たら確実に二塁→一塁の併殺を取りたい。同時にバント・盗塁への備えも忘れずに。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント</span> 送りバントでランナーを二塁に進めるのが基本策</li>
+    <li>バスターも有効（バントの構えから打つ）</li>
+    <li>エンドランのサインにも注意</li>
+    <li>最低限、右方向に転がしてランナーを進めたい</li>
+    <li>ゲッツーになる高めのボールは振らないように注意</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li><span class="tag tag-steal">盗塁</span> 足に自信があれば盗塁も選択肢</li>
+    <li>牽制球に備えたリード。帰塁の準備を怠らない</li>
+    <li>バントの構えが見えたらスタートの準備</li>
+    <li>ゴロが来たら全力で二塁へ（ゲッツー崩し）</li>
+    <li>ライナーは飛び出し注意！帰塁できる距離を保つ</li>
+    <li>フライはタッチアップ不要（一塁から二塁は通常タッチアップしない）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ノーアウトなので走者を確実に得点圏（二塁以上）に進めたい。手堅くバントか、積極的にエンドラン・盗塁を仕掛けるかはチーム方針次第。ゲッツーだけは避けたい。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー一二塁 (12)
+// ============================================================
+"0_12": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>クイック投球。セットポジションから素早く</li>
+    <li>バント処理が重要。三塁方向への送球判断（三塁フォースアウト狙い）</li>
+    <li>ゴロなら5-4-3（サード→セカンド→ファースト）のダブルプレーを意識</li>
+    <li>ストライク先行で追い込みたい</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> バント処理で三塁送球が最優先（リードランナーを刺す）</li>
+    <li>三塁への盗塁にも注意</li>
+    <li>守備隊形の指示。バントシフトの号令</li>
+    <li>ワイルドピッチ・パスボール厳禁（失点に直結）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> バント処理で前進。捕球後は三塁送球を第一に考える</li>
+    <li>一塁ランナーの牽制。ベースに付く</li>
+    <li>ゴロ処理→二塁送球でゲッツー</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ダブルプレーの中継点。二塁ベースカバー</li>
+    <li>バントシフト時は一塁カバーに回る</li>
+    <li>ゴロ→ 4-6-3（セカンド→ショート→ファースト）の併殺</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span><span class="tag tag-priority">最優先</span> バント処理の最前線。猛ダッシュで処理</li>
+    <li>捕球したら三塁ベースは空き（自分が前に出ている）→ショートが三塁カバー</li>
+    <li>強い打球なら三塁ベース踏んで一塁送球（5-3ゲッツー）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>サードが前進した場合の三塁ベースカバー</li>
+    <li>ダブルプレーの起点。二塁ベースカバーとの使い分け</li>
+    <li>中継プレーのポジション取り</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>二塁ランナーの生還を防ぐため、ヒット時は素早くカットマンへ返球</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> 正確な中継送球を意識</li>
+    <li>レフト：三塁後方カバー</li>
+    <li>センター：二塁カバー、または状況に応じて三塁中継ライン</li>
+    <li>ライト：一塁後方カバー</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>バント処理が勝負の分かれ目。三塁フォースアウトを取れれば大きい。ゴロならダブルプレーでピンチ脱出を狙う。内野全員でバントシフトの意思統一を。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント</span> 送りバントで一死二三塁を作るのが定石</li>
+    <li>バントは三塁側に転がすと処理が難しい（サード・ピッチャーの判断が迷う）</li>
+    <li>強打策の場合は外野フライでも得点のチャンス（犠牲フライ狙いは次の打者）</li>
+    <li>ゲッツーだけは絶対に避けたい</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>バント時は三塁へ確実に進塁</li>
+    <li>ゴロの打球方向を見て走る判断（三塁方向のゴロは止まる場面も）</li>
+    <li>ライナー・フライは飛び出し注意。帰塁最優先</li>
+    <li>ワイルドピッチ・パスボールで三塁を狙う</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>バント時は二塁へ進塁（フォースプレーなので迷わず走る）</li>
+    <li>ゴロは全力スタート（ゲッツー崩し）</li>
+    <li>フライ・ライナーは帰塁準備</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ノーアウトでチャンス拡大中。バントで確実に走者を進めるか、一気に得点を狙うか。ゲッツーで一気にチャンスが潰れるリスクに注意。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー一三塁 (13)
+// ============================================================
+"0_13": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>三塁ランナーの生還阻止が最優先。ワイルドピッチ厳禁</li>
+    <li>クイック投球で一塁ランナーの盗塁を警戒</li>
+    <li>バント処理→ホーム送球で三塁ランナーを刺す判断</li>
+    <li>牽制は一塁・三塁どちらにも。三塁偽投→一塁送球もあり</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> ホームベース死守。三塁ランナーの動きを常に確認</li>
+    <li>一塁ランナー盗塁時の対処：二塁送球の間に三塁ランナーが走る「ダブルスチール」に注意</li>
+    <li>二塁に投げるフリをしてすぐ三塁ランナーを見る（偽投）</li>
+    <li>バント処理時、ホームを空けない判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li>一塁ランナーの牽制を受ける</li>
+    <li>バント処理で前進。スクイズ警戒</li>
+    <li>ゴロ処理→ホーム送球（得点阻止）or 二塁送球（ゲッツー）の判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li>ダブルプレー狙い。二塁ベースカバー</li>
+    <li>バントシフト時は一塁カバー</li>
+    <li>盗塁＋ダブルスチールへの対応</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li><span class="tag tag-bunt">バント警戒</span> スクイズの可能性大。前進守備で構える</li>
+    <li>三塁ランナーにタッチプレーを仕掛ける場面もある</li>
+    <li>三塁ベースを離れるため、ショートとのカバー確認</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>サード前進時の三塁ベースカバー</li>
+    <li>ダブルプレーの起点</li>
+    <li>二塁ベースカバーとセカンドとの分担確認</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 外野フライでもタッチアップで1点。前進守備で犠牲フライを防ぐか、長打警戒で下がるか判断</li>
+    <li>ヒット時はホームへの中継送球ラインを意識</li>
+    <li>バックホーム送球は低い弾道でカットマンへ</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>最も複雑な状況の一つ。三塁ランナーの得点を防ぎつつ、一塁ランナーの盗塁・ダブルスチールにも対処が必要。スクイズ警戒も怠らない。「1点もやらない」か「1点は覚悟してゲッツーを取る」かチームで意思統一する。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li><span class="tag tag-bunt">スクイズ</span> スクイズバントで確実に1点を取る策がある</li>
+    <li>外野フライでも犠牲フライで得点できる（高く遠くに打つ）</li>
+    <li>ゴロでもフォースプレーの間に三塁ランナーが生還できる場合がある</li>
+    <li>最低限、三振とポップフライは避けたい</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>スクイズ時はピッチャーの投球と同時にスタート</li>
+    <li>ゴロが転がったらスタート。ただし正面のゴロは本封の危険</li>
+    <li>外野フライはタッチアップ準備。捕球と同時にスタート</li>
+    <li>ワイルドピッチ・パスボールで即ホームイン</li>
+    <li>ダブルスチールのサインにも対応</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>ダブルスチールの起点になる（自分が走ってキャッチャーの送球を誘い、三塁ランナーが走る）</li>
+    <li>ゴロは全力で二塁へ。ゲッツー崩しの意識</li>
+    <li>フライ・ライナーは帰塁</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>得点のチャンス大。スクイズ・犠牲フライ・ダブルスチールなど多くの選択肢がある。ノーアウトなので強気に攻めていきたい状況。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × ランナー二三塁 (23)
+// ============================================================
+"0_23": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ワイルドピッチ絶対厳禁（即失点）</li>
+    <li>バント処理→ホーム送球の準備</li>
+    <li>敬遠策（満塁策）で次の打者との勝負もあり得る</li>
+    <li>低めのボールでゴロを打たせたい</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 後逸厳禁。ワンバウンドは体で止める</li>
+    <li>スクイズ警戒。バント処理→三塁ランナーのタッチ</li>
+    <li>前進守備の指示</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> フォースプレーなし。タッチプレーが必要</li>
+    <li>ゴロ→ホーム送球で三塁ランナーを刺す判断</li>
+    <li>一塁は空いているのでバッターランナーのアウトは後回し</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li>ゴロ処理→ホーム送球 or 一塁送球の判断</li>
+    <li>深い打球なら一塁でアウトを取り、浅い打球ならホーム</li>
+    <li>二塁カバーの意識</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li>スクイズ警戒で前進。ベースを離れるが三塁ランナーがいるので帰塁なし</li>
+    <li>ゴロ処理→ホーム送球が第一選択</li>
+    <li>三塁線を抜かれると長打→2点</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>ゴロ処理→ホーム送球 or 三塁カバー</li>
+    <li>内野はホーム送球優先の意識統一</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 前進守備。犠牲フライでの得点阻止を最優先</li>
+    <li>捕球後はホームへ素早い送球</li>
+    <li>浅いフライでもタッチアップされる。捕球体勢から即送球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>フォースプレーがないため、ホームはタッチプレーが必要。内野ゴロでも確実にホーム送球できるか、確実なアウト（一塁）を取るかの判断が問われる。外野は前進守備で犠牲フライ阻止。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>外野フライで1点（犠牲フライ）。できるだけ遠くに飛ばす</li>
+    <li>ゴロでも三塁ランナーが走れる場合がある</li>
+    <li>内野ゴロでホームタッチアウトにならないよう、強い打球を意識</li>
+    <li>ノーアウトなので強打で一気に大量点も狙える</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>外野フライはタッチアップで確実にホームイン</li>
+    <li>ゴロの打球方向と強さを見てスタート判断。弱いゴロや投手正面は危険</li>
+    <li>ワイルドピッチ・パスボールで即スタート</li>
+    <li>スクイズのサインにも準備</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>三塁ランナーの動きに連動。三塁が空いたら三塁へ進塁</li>
+    <li>ヒットなら一気にホームを狙う</li>
+    <li>フライ・ライナーは帰塁準備</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ノーアウトで絶好の得点機。犠牲フライでも1点入る。慌てずに確実に得点を重ねたい。打者は最低限フライを打ち上げる意識で。</p>
+</div>
+`
+},
+
+// ============================================================
+// ノーアウト (0) × 満塁 (123)
+// ============================================================
+"0_123": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> ストライクを投げること。フォアボール＝押し出し＝失点</li>
+    <li>ワイルドピッチ厳禁</li>
+    <li>ゴロを打たせてダブルプレー（ホーム→一塁 or 二塁→一塁）</li>
+    <li>三振を取れるカウントなら勝負球で三振を狙う</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> 全塁フォースプレー。ゴロが来たらホームベースを踏んで一塁送球（ゲッツー）</li>
+    <li>パスボール・後逸厳禁</li>
+    <li>バント処理もホーム踏むだけでフォースアウト</li>
+    <li>内野の声掛けと守備位置指示</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ゲッツー完成のため一塁ベースに入る</li>
+    <li>前進守備でゴロ処理→ホーム送球の選択肢も</li>
+    <li>バント処理→ホーム送球 or 一塁ベース踏む</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド</h4>
+  <ul>
+    <li>ゲッツーの中継。4-6-3（セカンド→ショート→ファースト）</li>
+    <li>前進守備でゴロ→ホーム送球も選択肢</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li>ゴロ処理→ホームベース送球（フォースアウト）が第一選択</li>
+    <li>スクイズ警戒で前進</li>
+    <li>強い打球なら三塁ベース踏んで一塁送球（5-3ゲッツー）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🔵 ショート</h4>
+  <ul>
+    <li>ゴロ処理→二塁踏んで一塁送球 or ホーム送球</li>
+    <li>ダブルプレーの起点として最重要</li>
+    <li>三塁ベースカバー</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>前進守備で犠牲フライ阻止</li>
+    <li>捕球後はホームへ送球（カットマン経由）</li>
+    <li>ヒットで複数得点の可能性があるため正確な返球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>全塁フォースプレーなのでどのベースでもアウトが取れるのが有利。ホーム→一塁のゲッツーを最優先。フォアボールとワイルドピッチだけは絶対に出さない。バッテリーが落ち着くことが最も大切。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>スクイズで確実に1点を取る策がある</li>
+    <li>強打で長打なら一気に大量点のチャンス</li>
+    <li>フォアボールでも押し出しで1点入る。ボール球は振らない</li>
+    <li>ゲッツーになるとチャンスが一気に萎む。高めの釣り球に注意</li>
+    <li>外野フライでも犠牲フライで1点</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> ゴロが来たら走るしかない（フォース状態）</li>
+    <li>ホームでのフォースアウトに注意</li>
+    <li>外野フライはタッチアップ準備</li>
+    <li>ワイルドピッチで即ホームイン</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁・一塁ランナーの意識</h4>
+  <ul>
+    <li>全員フォース状態。ゴロが来たら全力スタート</li>
+    <li>ライナー・フライは飛び出し注意。帰塁最優先</li>
+    <li>ゲッツー崩し（二塁ベースへのスライディング）を意識</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>最大のチャンス。フォアボールでも得点できる有利な状況。ただしフォースプレーでゲッツーも取られやすい。ボール球を見極めてストライクを強く打つことが大切。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー一塁 (1)
+// ============================================================
+"1_1": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>クイックモーション。盗塁警戒</li>
+    <li>ダブルプレーを取ればチェンジ。低めでゴロを打たせたい</li>
+    <li>牽制球でランナーを釘付け</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-steal">盗塁警戒</span> 二塁送球の準備</li>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ゲッツーを取ればチェンジ。「ゲッツー！」の声掛け</li>
+    <li>バント警戒は状況次第（ワンアウトでのバントは少ない）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li>ランナー牽制。ベースに付く</li>
+    <li>ゴロ→二塁→一塁のゲッツーに備える</li>
+    <li>エンドラン警戒。一二塁間が空きやすい</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド・🔵 ショート</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> 二塁ベースカバーの分担を確認。ゲッツーを確実に完成</li>
+    <li>盗塁に備えた二塁カバー</li>
+    <li>エンドラン時の対処（打球がない場合もベースカバーに入る）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li>ゴロ処理→二塁送球でゲッツーの起点</li>
+    <li>バント警戒は低め（ワンアウトではバントは少ないが0ではない）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>通常守備位置。長打警戒</li>
+    <li>ヒット時は二塁への素早い返球でランナーの三塁進塁を防ぐ</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ダブルプレーを取ればチェンジ。内野はゲッツー意識を高く持つ。盗塁されると一死二塁でピンチが広がるので、バッテリーの盗塁阻止も重要。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ゲッツーを避けることが最優先。高めの釣り球に注意</li>
+    <li>進塁打（右方向へのゴロ）でランナーを二塁に進める</li>
+    <li>エンドランのサインの可能性</li>
+    <li>ヒットで一気にチャンスを広げたい</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>盗塁で二塁に進めると得点圏。足があれば積極的に</li>
+    <li>ゴロはゲッツー崩しを意識した走塁</li>
+    <li>ライナーは帰塁準備。飛び出し厳禁</li>
+    <li>エンドラン時は必ずスタートを切る</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ワンアウトなのでゲッツーでチェンジになる。ゲッツーだけは避けつつ、盗塁やエンドランでランナーを得点圏に進めたい。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー一二塁 (12)
+// ============================================================
+"1_12": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>ダブルプレーでチェンジを狙う。低めでゴロを打たせる</li>
+    <li>クイック投球で盗塁（三盗）警戒</li>
+    <li>ゴロ→5-4-3 or 6-4-3のゲッツー狙い</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>三盗の警戒。二塁ランナーの大きなリードに注意</li>
+    <li>ゲッツーの声掛けと指示</li>
+    <li>パスボール注意（二塁ランナーが三塁に進むと大ピンチ）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド・🔵 ショート</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ダブルプレーの中核。確実な捕球と素早い送球</li>
+    <li>二塁ベースカバーの分担確認</li>
+    <li>三盗への対応（二塁ランナーが走ったら三塁送球）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト</h4>
+  <ul>
+    <li>ゲッツーの完成（一塁ベースで送球を受ける）</li>
+    <li>一塁ランナーの牽制受け</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード</h4>
+  <ul>
+    <li>ゴロ→三塁ベース踏んで一塁送球（5-3ゲッツー）も狙える</li>
+    <li>二塁ランナーの三盗時のベースカバー</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>二塁ランナーがいるので、ヒット時はホーム方向への返球を意識</li>
+    <li><span class="tag tag-cutoff">中継・カバー</span> カットマンへ正確な送球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ゲッツーでチェンジ。ゴロが来たら確実に併殺を完成させたい。二塁ランナーの三盗も警戒ポイント。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ゲッツー回避が最重要。高めの釣り球に手を出さない</li>
+    <li>ヒットなら大量点のチャンス</li>
+    <li>外野フライでも二塁ランナーが三塁へ（タッチアップ）</li>
+    <li>最低限ゲッツーにならない打撃を</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>ヒットなら一気にホームを狙う</li>
+    <li>ゴロの打球方向を見て走塁判断</li>
+    <li>外野フライではタッチアップで三塁へ</li>
+    <li>ライナーは帰塁最優先</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>ゴロは全力で二塁へ。ゲッツー崩しの走塁</li>
+    <li>ライナー・フライは帰塁</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ゲッツーでチャンス消滅。ゲッツー回避を最優先しつつ、ヒットなら大量点のチャンスを逃さない。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー一三塁 (13)
+// ============================================================
+"1_13": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>三塁ランナーの生還を防ぎたいが、ゲッツーでチェンジも狙える</li>
+    <li>クイック投球でダブルスチール警戒</li>
+    <li>低めのボールでゴロを打たせる</li>
+    <li>「1点は覚悟でゲッツー狙い」か「ホーム送球で得点阻止」か決めておく</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> ダブルスチール対策。二塁に投げる間に三塁ランナーが走る</li>
+    <li>ゴロ→ホーム送球（フォースアウトではないのでタッチ）or 二塁送球でゲッツー</li>
+    <li>一塁ランナー盗塁時は「投げない」判断も重要（偽投で三塁ランナーを牽制）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟣 セカンド・🔵 ショート</h4>
+  <ul>
+    <li>ゲッツーの中継。二塁ベースカバー</li>
+    <li>ダブルスチール時、二塁でカットしてホームへ転送する技術</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟢 サード・🟠 ファースト</h4>
+  <ul>
+    <li>内野ゴロの処理。ホーム送球かゲッツーか瞬時の判断</li>
+    <li>三塁ランナーの動きを見て判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>外野フライでタッチアップ→三塁ランナー生還に注意</li>
+    <li>浅めの前進守備でタッチアップ阻止を狙うか、長打警戒で下がるか</li>
+    <li>ホームへの送球ライン確認</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ゲッツー取ればチェンジだが1点入る可能性が高い。「1点と引き換えにゲッツーでチェンジ」を受け入れるかどうか、事前にチームで意思統一を。ダブルスチール対策も必須。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>犠牲フライで1点取れる。外野に飛ばす意識</li>
+    <li>内野ゴロでもゲッツーの間に三塁ランナーが生還（1点と引き換え）</li>
+    <li>ヒットで2点以上狙える</li>
+    <li>最低限、外野フライか強いゴロを打ちたい</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>外野フライはタッチアップで確実にホームイン</li>
+    <li>内野ゴロでもスタート可能。ゲッツーの間にホームを狙える</li>
+    <li>ダブルスチールの準備</li>
+    <li>ワイルドピッチ・パスボールで即スタート</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>ダブルスチールの起点。三塁ランナーの得点をアシスト</li>
+    <li>ゴロはゲッツー崩しの走塁</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>犠牲フライ・内野ゴロ・ダブルスチールなど得点方法が豊富。最低1点は取りたい場面。ゲッツーでも1点入ることが多いので強気に攻める。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × ランナー二三塁 (23)
+// ============================================================
+"1_23": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>満塁策（敬遠）でフォースプレーを作る選択肢もある</li>
+    <li>ワイルドピッチ厳禁。低めに集めたいがワンバウンド注意</li>
+    <li>三振が取れれば理想</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 後逸厳禁。ワンバウンドは体で止める</li>
+    <li>スクイズ警戒</li>
+    <li>内野のポジション指示（前進守備 or 通常守備）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟠 ファースト・🟣 セカンド・🟢 サード・🔵 ショート</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> フォースプレーなし（一塁が空き）。ホームはタッチプレー</li>
+    <li>前進守備でゴロ→ホーム送球で得点阻止を狙うか</li>
+    <li>定位置で確実にアウト（一塁）を取るか、チームで統一</li>
+    <li>内野ゴロでも打球が強ければ一塁で確実にアウト（1点は覚悟）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> 前進守備。犠牲フライ阻止</li>
+    <li>捕球後はバックホーム（カットマン経由）</li>
+    <li>浅いフライでもタッチアップされる</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>フォースプレーがないのが痛い。敬遠で満塁にしてフォースプレーを作る作戦も有効。前進守備でホーム送球を狙うか、確実にアウトカウントを増やすか、指揮者の判断が問われる。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>犠牲フライで1点。外野に飛ばすことを最優先</li>
+    <li>内野前進守備の頭を越える打球が打てれば長打になりやすい</li>
+    <li>ゴロでも三塁ランナーのスタート次第で得点可能</li>
+    <li>三振、ポップフライは避けたい</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>外野フライはタッチアップ。確実にホームイン</li>
+    <li>内野ゴロは前進守備ならスタート判断が重要</li>
+    <li>ワイルドピッチで即スタート</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>三塁ランナーがホームインしたら三塁を狙う</li>
+    <li>ヒットなら一気にホーム狙い</li>
+    <li>フライは帰塁準備</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>犠牲フライで確実に1点。守備が前進している分、内野の頭を越える打球が打てれば大量点のチャンス。最低1点は確実に取りたい。</p>
+</div>
+`
+},
+
+// ============================================================
+// ワンアウト (1) × 満塁 (123)
+// ============================================================
+"1_123": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>フォアボール＝押し出し。ストライク先行で追い込む</li>
+    <li>ダブルプレーでチェンジが最高のシナリオ</li>
+    <li>ゴロを打たせる（低め中心の配球）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> 全塁フォースプレー。ゴロはホーム踏んで一塁（ゲッツー）</li>
+    <li>後逸厳禁。1球1球丁寧に</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li><span class="tag tag-dp">ゲッツー警戒</span> ゲッツーでチェンジ。全ポジションでゲッツーの意識</li>
+    <li>フォースプレーなのでどのベースでもアウトが取れる</li>
+    <li>前進守備でホームゲッツー狙いか、通常守備でセカンドゲッツー狙いか統一</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>前進守備で犠牲フライ阻止</li>
+    <li>ヒットで複数得点の可能性。素早い返球</li>
+    <li>捕球→ホーム送球→カットマン経由の中継ライン確認</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>ゲッツーでチェンジ + 全塁フォースの有利な状況。フォアボールと暴投さえ出さなければ守りやすい。ホーム→一塁のゲッツーが最短ルート。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ゲッツーでチャンス消滅。高めのボール球に手を出さない</li>
+    <li>フォアボールで押し出し1点。ボール球を見極める冷静さ</li>
+    <li>犠牲フライで1点。最低限外野フライを上げる</li>
+    <li>ヒットなら大量点</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 全ランナー共通</h4>
+  <ul>
+    <li>フォース状態。ゴロが来たら全員スタート</li>
+    <li>ライナー・フライは帰塁最優先。飛び出しゲッツーは最悪</li>
+    <li>三塁ランナーは外野フライでタッチアップ準備</li>
+    <li>ワイルドピッチは全員1つ進塁</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>最大のチャンスだが、ゲッツーでチェンジのリスクも。ボール球の見極めが最重要。フォアボールでも1点入る有利な状況を活かす。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー一塁 (1)
+// ============================================================
+"2_1": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>あと1アウトでチェンジ。集中して打ち取る</li>
+    <li>盗塁されても二塁に行くだけ。打者との勝負に集中してもよい</li>
+    <li>フォアボールは避けたい（一二塁でピンチ拡大）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>ダブルプレー不要。確実に1つアウトを取ることに集中</li>
+    <li>盗塁を刺せれば三振と同じ効果（チェンジ）</li>
+    <li>長打警戒の配球</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>ゲッツーは不要。確実にバッターランナーを一塁でアウト</li>
+    <li>通常守備位置でOK</li>
+    <li>長打への備え（三塁線・一塁線を締める場合もある）</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットで一塁ランナーが一気にホームを狙う可能性。長打警戒</li>
+    <li>二塁打でも得点のチャンスが出る。正確な中継送球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>シンプルに1アウト取ればチェンジ。確実にバッターをアウトにすることに集中。無理な送球やエラーで出塁させないこと。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ツーアウトなのでゲッツーの心配なし。思い切って打てる</li>
+    <li>長打を打てば一気に得点のチャンス</li>
+    <li>粘ってフォアボールでも繋がる</li>
+    <li>三振だけは避けたい（簡単に追い込まれない）</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>ツーアウトなので打球が飛んだら即スタート（迷いなし）</li>
+    <li>長打なら一気にホームを狙う</li>
+    <li>盗塁で二塁に進めればシングルヒットで生還できる</li>
+    <li>パスボール・ワイルドピッチで進塁</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ツーアウトなのでゲッツーの心配なし。打者もランナーも積極的に攻める場面。ランナーが盗塁で二塁に進めるとシングルヒット1本で生還可能。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー一二塁 (12)
+// ============================================================
+"2_12": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>あと1アウトでチェンジ。集中して打ち取る</li>
+    <li>長打を打たれると一気に2点の危険</li>
+    <li>フォアボールで満塁は避けたい</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>長打警戒の配球。パスボール注意</li>
+    <li>フォースプレーがあるので、ゴロならどのベースでもアウトを取りに行ける</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> 全ベースでフォースアウト可能。最も近いベースでアウトを取る</li>
+    <li>ゲッツー不要。確実に1アウトを</li>
+    <li>一塁が最も確実。無理にセカンドで刺そうとしない</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>長打警戒。深めの守備位置</li>
+    <li>二塁ランナーの生還を防ぐ。ヒット時はホーム方向への返球</li>
+    <li>頭上を越されると2点入る。無理に前進しない</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>1アウト取ればチェンジ。フォースプレーが使えるので最も近いベースで確実にアウト。長打だけは防ぎたい（2点入る可能性）。確実なプレーを心がける。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ツーアウト。ゲッツーの心配なく思い切って打てる</li>
+    <li>長打なら一気に2点。外野の間を抜く打球を狙う</li>
+    <li>シングルヒットでも二塁ランナーが生還の可能性</li>
+    <li>フォアボールでも繋がる。ボール球は振らない</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>ツーアウトなので打球が飛んだら迷わずスタート</li>
+    <li>シングルヒットで一気にホーム狙い。三塁コーチの指示をよく見る</li>
+    <li>外野の守備位置と肩の強さを確認しておく</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>打球と同時にスタート。三塁を狙う走塁</li>
+    <li>ツーアウトなのでフライでも帰塁不要（打った瞬間に走る）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ツーアウトなのでランナーは打球と同時にスタート。ヒット1本で一気に得点を狙える。打者は積極的に打ちに行きたい。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー一三塁 (13)
+// ============================================================
+"2_13": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>1アウトでチェンジ。バッターとの勝負に集中</li>
+    <li>盗塁されてもOK（一塁ランナーが二塁に行くだけ）</li>
+    <li>ワイルドピッチ＝失点。コントロール重視</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>パスボール注意。三塁ランナーの生還阻止</li>
+    <li>一塁ランナーの盗塁は無視してもよい（二塁に行くだけ）</li>
+    <li>バッターをアウトにすることに集中</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>確実に1アウト。最も確実なプレーを選択</li>
+    <li>三塁ランナーの生還は防ぎたいが、無理なホーム送球でセーフになるよりバッターをアウトに</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットで最低1点。長打なら2点以上</li>
+    <li>打球処理後の的確な返球</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>シンプルに1アウトでチェンジ。バッターをアウトにすることだけに集中。ワイルドピッチ・パスボールの失点だけは防ぐ。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒットなら最低1点。思い切って打つ</li>
+    <li>長打なら一気に大量得点</li>
+    <li>ツーアウトなのでゲッツーの心配なし</li>
+    <li>フォアボールでも満塁で繋がる</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>打球が飛んだら即スタート（ツーアウトなので帰塁不要）</li>
+    <li>ワイルドピッチ・パスボールで即ホームイン</li>
+    <li>盗塁で一塁ランナーが走る場合、ダブルスチールも選択肢</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 一塁ランナーの意識</h4>
+  <ul>
+    <li>打球と同時にスタート</li>
+    <li>盗塁も有効（ツーアウトなのでリスク低い）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ヒット1本で得点。ツーアウトなのでランナーは全力スタート。打者は積極的に振りに行く場面。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × ランナー二三塁 (23)
+// ============================================================
+"2_23": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li>敬遠して満塁策（一塁を埋めてフォースプレーを作る）が有効な場面</li>
+    <li>ワイルドピッチ＝失点。丁寧な投球</li>
+    <li>勝負するなら三振を狙う</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li>後逸厳禁。慎重にキャッチング</li>
+    <li>フォースプレーなし。ゴロでホームはタッチが必要</li>
+    <li>敬遠の指示判断</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span>なし。一塁が空いている</li>
+    <li>ゴロは一塁でバッターランナーをアウトが最も確実</li>
+    <li>打球が弱ければホーム送球（タッチプレー）の判断も</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットで2点入る可能性。打球処理は素早く</li>
+    <li>長打警戒で深めの守備。前進して頭を越されると致命的</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>1アウトでチェンジ。敬遠で満塁にしてフォースプレーを使えるようにする策も有効。勝負するなら確実にバッターをアウトにすること。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒット1本で2点のチャンス。集中して打席に立つ</li>
+    <li>敬遠される可能性あり。次の打者も心構えを</li>
+    <li>ツーアウトなのでゲッツー心配なし。思い切って打てる</li>
+    <li>ボール球に手を出さない（敬遠気味の配球に注意）</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 三塁ランナーの意識</h4>
+  <ul>
+    <li>打球が飛んだら即スタート</li>
+    <li>ワイルドピッチ・パスボールで即ホームイン</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 二塁ランナーの意識</h4>
+  <ul>
+    <li>打球と同時にスタート。ヒットならホーム狙い</li>
+    <li>三塁コーチの指示をよく見る</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>ヒット1本で大量得点のチャンス。敬遠される可能性があるので、次の打者も含めて準備を。ランナーは打球と同時にスタート。</p>
+</div>
+`
+},
+
+// ============================================================
+// ツーアウト (2) × 満塁 (123)
+// ============================================================
+"2_123": {
+defense: `
+<div class="pos-block">
+  <h4>🔴 ピッチャー</h4>
+  <ul>
+    <li><span class="tag tag-priority">最優先</span> フォアボール＝押し出し＝失点。ストライクで勝負</li>
+    <li>全塁フォースプレーが使える有利な状況</li>
+    <li>ゴロを打たせればどのベースでもアウトを取れる</li>
+    <li>三振が取れれば最高</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🟡 キャッチャー</h4>
+  <ul>
+    <li><span class="tag tag-force">フォースプレー</span> ゴロはホームベース踏むだけでアウト。最短距離</li>
+    <li>パスボール厳禁</li>
+    <li>強気のリードでバッターを打ち取る</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>内野全体</h4>
+  <ul>
+    <li>全塁フォースプレー。最も近いベースに送球して1アウト→チェンジ</li>
+    <li>無理に難しいプレーをしない。確実にアウト1つ</li>
+    <li>ゴロなら「どこでもいいからアウトを取る」意識</li>
+  </ul>
+</div>
+<div class="pos-block">
+  <h4>🌿 外野手</h4>
+  <ul>
+    <li>ヒットで大量点の危険。ただし深めの守備で長打は防ぐ</li>
+    <li>頭を越されると3点以上入る可能性</li>
+    <li>素早い返球でホームでの追加得点を防ぐ</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 守備の最重要ポイント</h5>
+  <p>全塁フォースプレーは守備側の大きなアドバンテージ。1アウト取ればチェンジ。フォアボールとパスボールだけは絶対に出さない。バッテリーの冷静さが全て。</p>
+</div>
+`,
+offense: `
+<div class="off-block">
+  <h4>🏏 バッターの意識</h4>
+  <ul>
+    <li>ヒット1本で大量得点。ツーアウトでも最大のチャンス</li>
+    <li>フォアボールでも押し出し1点。ボール球は絶対に振らない</li>
+    <li>ピッチャーにプレッシャーがかかっている。冷静に甘い球を待つ</li>
+    <li>ツーアウトなのでゲッツーの心配なし</li>
+  </ul>
+</div>
+<div class="off-block">
+  <h4>🏃 全ランナー共通</h4>
+  <ul>
+    <li>フォース状態だが、ツーアウトなので打球が飛んだら全員スタート</li>
+    <li>フライでもツーアウトなので打球と同時にスタートしてOK</li>
+    <li>ワイルドピッチで全員1つ進塁（三塁ランナーは得点）</li>
+  </ul>
+</div>
+<div class="key-point">
+  <h5>💡 攻撃の最重要ポイント</h5>
+  <p>一打大量得点の最大チャンス。ピッチャーにプレッシャーがかかる場面。ボール球を振らず、甘い球を逃さない集中力が勝負を決める。</p>
+</div>
+`
+}
+
+};
+
+// Scroll to top
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('show', window.scrollY > 400);
+});
+</script>
+
+</body>
+</html>
